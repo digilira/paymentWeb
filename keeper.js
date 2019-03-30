@@ -1,4 +1,4 @@
-var socket = io.connect('https://payment.digilira.com:8080', {secure: true});
+var socket = io.connect('http://localhost:8080', {secure: true});
 
 var mobile = 0;
 var ua = navigator.userAgent;
