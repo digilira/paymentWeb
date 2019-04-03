@@ -26,7 +26,7 @@ At first launch an empty page will appear and an admin panel will be visible on 
 
 # How to edit an existing item;
 
-1. Selectct an existing item from select box
+1. Select an existing item from select box
 2. Edit ITEM INFORMATION, AMOUNT and COIN data and hit Add Item
 
 WavesKeeper will request a data transaction, as soon as you approve the transaction it will be on blockchain and you will be able to see your product on your page.
