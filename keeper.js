@@ -199,8 +199,8 @@ socket.on('fetch', function(data){
 
 
 	productbuttons.appendChild(addItem);
-	newItem.style.display = "block";
-		
+	newItem.style.display = data[2];
+
 	colsm3.appendChild(newItem);
 
 	//ADMIN PANEL -!!
@@ -401,38 +401,32 @@ var app = new Vue({
 			}
 		},
 
+ 
+
 		auth: async function() {
 			let msg = this.message;
 			let params = {
 				name: 'digilira pay',
 				data: 'digilira Test'
 			}
-			if (this.checkKeeper()) {
-				try {  
-					let res = await window.Waves.auth(params);
-					console.log(res);
-					socket.emit('fetch', {
-						data:res,
-					});
-
-				} catch (err) {
-					console.log(err); 
-					socket.emit('fetch', {
-						data:err,
-					});
-				}
-			} else {
-				socket.emit('fetch', {
-					data:"NO-KEEPER",
+			try {  
+				let res = await window.Waves.auth(params);
+ 				socket.emit('fetch', {
+					data:res,
 				});
-				
-				alert('Install Waves Keeper');
+
+			} catch (err) {
+ 				socket.emit('fetch', {
+					data:err,
+				});
 			}
+
 		},
 
 		checkKeeper: function() {
 			return typeof window.Waves !== 'undefined';
 		}
+
 	}
 });
 app.auth();
