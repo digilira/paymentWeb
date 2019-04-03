@@ -4,7 +4,7 @@
 
 # Get Started
 
-Download this folder and put it in your httpd server folder.
+Download this folder and put it in your http server folder.
 
 Change this value according to your NodeJS server address. 
 
