@@ -23,7 +23,7 @@ socket.on('result1', function(data){
 
 	$(qrdiv).empty();
 	$(qrdiv).qrcode(qrcode);
-        $(qrdiv).unbind();
+	$(qrdiv).unbind();
 	$(qrdiv).click(function(){
 
 		var win = window.open(qrcode, '_blank');
@@ -55,10 +55,6 @@ socket.on('result1', function(data){
 
 
 });
-
-
-
-
 
 socket.on('fetch', function(data){
 
@@ -96,7 +92,6 @@ socket.on('fetch', function(data){
 
 	productQR.style.display = "none";
 
-
 	var row_root2 = document.createElement('div');
 	row_root2.className = 'row'; 
 
@@ -110,6 +105,105 @@ socket.on('fetch', function(data){
 	colsm9.appendChild(row_root2);
 
 
+	// ADMIN PANEL
+
+	var newItem = document.createElement('div');
+	newItem.id = "admin";
+	newItem.className = 'QR';
+
+	var header = document.createElement('div');
+	header.className = 'product-title'; 
+	header.id = 'product-title';  
+	header.textContent = "ADMIN PANEL";
+
+	var info = document.createElement('div');
+	info.className = 'admin-panel';
+
+	var selItem = document.createElement("select");
+	selItem.class = "form-control input-sm";
+	selItem.name = "coin";
+	selItem.id = "item";
+
+	selItem.options[selItem.length] = new Option("NEW ITEM", "-1");
+
+	data[0].forEach(function(element) {
+		var value = element.key;
+		selItem.options[selItem.length] = new Option(element.value['item'], value);
+	} );
+
+	var textbox = document.createElement('input');
+	textbox.type = 'text'; 
+	textbox.placeholder = "ITEM INFORMATION";
+	info.appendChild(textbox); 
+
+	var pricetag = document.createElement('input');
+	pricetag.type = 'text'; 
+	pricetag.placeholder = "AMOUNT";
+	info.appendChild(pricetag); 
+
+	var productbuttons = document.createElement('div');
+	productbuttons.className = 'product-buttons';
+
+	newItem.appendChild(header);
+	newItem.appendChild(selItem);
+	newItem.appendChild(info);   
+	newItem.appendChild(productbuttons);
+
+
+	var formgroup = document.createElement('div');
+	formgroup.className = 'form-group'; 
+	productbuttons.appendChild(formgroup);
+
+
+	var label = document.createElement("LABEL");
+	label.textContent = "Choose Coin"; 
+	formgroup.appendChild(label);
+
+
+	var selCoin = document.createElement("select");
+	selCoin.class = "form-control input-sm";
+	selCoin.name = "coin";
+	selCoin.id = "waves-sid";
+
+	for (var key in data[1]) {
+		var value = data[1][key];
+		selCoin.options[selCoin.length] = new Option(key, value);
+	} 
+
+	formgroup.appendChild(selCoin);
+
+	var addItem = document.createElement('div');
+	addItem.className = 'btn btn-primary btn-block btn-xs';
+	addItem.textContent = "Add Item";
+
+	addItem.onclick = function () {
+
+		var  e = document.getElementById (  selCoin.id );
+		var  strUser = e.options [e.selectedIndex].value;
+
+		var  f = document.getElementById (  selItem.id );
+		var  strId = f.options [f.selectedIndex].value;
+
+		var params = {
+			id: strId,
+			item: textbox.value,
+			coin:  strUser,
+			amount: pricetag.value,
+		};
+
+		socket.emit('admin', {
+			data: params
+		});
+
+	}
+
+
+	productbuttons.appendChild(addItem);
+	newItem.style.display = "block";
+		
+	colsm3.appendChild(newItem);
+
+	//ADMIN PANEL -!!
 
 	data[0].forEach(function(element) {
 
@@ -140,7 +234,7 @@ socket.on('fetch', function(data){
 		}
 
 		img.onerror = function() {
-			picture.textContent = element.key;
+			picture.textContent = "You should add your image to img folder with the following name: " + element.key + ".jpg";
 		}
 
 		product.appendChild(picture);
@@ -205,12 +299,7 @@ socket.on('fetch', function(data){
 
 		}
 
-		productbuttons.appendChild(buybutton);
-
-
-
-
-
+		productbuttons.appendChild(buybutton); 
 	});
 
 
@@ -312,10 +401,39 @@ var app = new Vue({
 			}
 		},
 
+		auth: async function() {
+			let msg = this.message;
+			let params = {
+				name: 'digilira pay',
+				data: 'digilira Test'
+			}
+			if (this.checkKeeper()) {
+				try {  
+					let res = await window.Waves.auth(params);
+					console.log(res);
+					socket.emit('fetch', {
+						data:res,
+					});
+
+				} catch (err) {
+					console.log(err); 
+					socket.emit('fetch', {
+						data:err,
+					});
+				}
+			} else {
+				socket.emit('fetch', {
+					data:"NO-KEEPER",
+				});
+				
+				alert('Install Waves Keeper');
+			}
+		},
+
 		checkKeeper: function() {
 			return typeof window.Waves !== 'undefined';
 		}
 	}
 });
-app.fetchData();
+app.auth();
 
